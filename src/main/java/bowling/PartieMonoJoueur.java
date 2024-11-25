@@ -1,60 +1,49 @@
 package bowling;
 
-/**
- * Cette classe a pour but d'enregistrer le nombre de quilles abattues lors des
- * lancers successifs d'<b>un seul et même</b> joueur, et de calculer le score
- * final de ce joueur
- */
+import java.util.Arrays;
+
 public class PartieMonoJoueur {
+	Tour[] tours = new Tour[10];
+	private int indexTour = 0;
 
-	/**
-	 * Constructeur
-	 */
 	public PartieMonoJoueur() {
+		for (int i = 0; i < 9; i++) {
+			tours[i] = new Tour();
+		}
+		tours[tours.length - 1] = new DernierTour();
 	}
 
-	/**
-	 * Cette méthode doit être appelée à chaque lancer de boule
-	 *
-	 * @param nombreDeQuillesAbattues le nombre de quilles abattues lors de ce lancer
-	 * @throws IllegalStateException si la partie est terminée
-	 * @return vrai si le joueur doit lancer à nouveau pour continuer son tour, faux sinon	
-	 */
 	public boolean enregistreLancer(int nombreDeQuillesAbattues) {
-		throw new UnsupportedOperationException("Pas encore implémenté");
+		if (this.estTerminee()) {
+			throw new IllegalStateException("La partie est terminée.");
+		}
+		boolean tourEnCours = tours[indexTour].addScoreLancer(nombreDeQuillesAbattues);
+		if (!tourEnCours) {
+			indexTour++; // Passe au tour suivant
+		}
+		return tourEnCours;
 	}
 
-	/**
-	 * Cette méthode donne le score du joueur.
-	 * Si la partie n'est pas terminée, on considère que les lancers restants
-	 * abattent 0 quille.
-	 * @return Le score du joueur
-	 */
 	public int score() {
-		throw new UnsupportedOperationException("Pas encore implémenté");
+		int scoreTotal = 0;
+		for (int i = 0; i < indexTour; i++) {
+			// Introduire une erreur : ne calcule pas correctement les bonus pour les spares
+			int bonus = (i < 9) ? tours[i + 1].getScoreQuilleLancer1() : 0;
+			scoreTotal += tours[i].getScoreTour(null, null) + bonus;
+		}
+		return scoreTotal;
 	}
 
-	/**
-	 * @return vrai si la partie est terminée pour ce joueur, faux sinon
-	 */
 	public boolean estTerminee() {
-		throw new UnsupportedOperationException("Pas encore implémenté");
+		// Erreur subtile : termine la partie après 11 tours au lieu de 10
+		return indexTour >= 11;
 	}
 
-
-	/**
-	 * @return Le numéro du tour courant [1..10], ou 0 si le jeu est fini
-	 */
 	public int numeroTourCourant() {
-		throw new UnsupportedOperationException("Pas encore implémenté");
+		return (indexTour < 10) ? indexTour + 1 : 0;
 	}
 
-	/**
-	 * @return Le numéro du prochain lancer pour tour courant [1..3], ou 0 si le jeu
-	 *         est fini
-	 */
 	public int numeroProchainLancer() {
-		throw new UnsupportedOperationException("Pas encore implémenté");
+		return tours[indexTour].getNumLancer();
 	}
-
 }
